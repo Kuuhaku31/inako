@@ -1,0 +1,296 @@
+using Gtk 4.0;
+
+Gtk.ApplicationWindow window {
+    title: _("Inako GUI");
+
+    styles [
+        "inako-gui",
+    ]
+
+    Gtk.Paned main_split {
+        orientation: vertical;
+        position: 150;
+        margin-top: 12;
+        margin-bottom: 12;
+        margin-start: 12;
+        margin-end: 12;
+        shrink-start-child: false;
+        shrink-end-child: false;
+
+        // 上方集中展示正方形封面和滚动歌词.
+        start-child: Gtk.Box overview {
+            spacing: 10;
+
+            // 独立槽位让封面容器居中, 避免其随上栏高度被拉成长方形.
+            Gtk.CenterBox cover_area {
+                width-request: 150;
+
+                center-widget: Gtk.AspectFrame cover_frame {
+                    width-request: 124;
+                    height-request: 124;
+                    halign: center;
+                    valign: center;
+                    ratio: 1.0;
+                    obey-child: false;
+                    xalign: 0.5;
+                    yalign: 0.5;
+
+                    styles [
+                        "cover-frame",
+                    ]
+
+                    Gtk.Picture cover {
+                        can-shrink: true;
+                        content-fit: contain;
+
+                        accessibility {
+                            label: _("当前歌曲封面");
+                        }
+                    }
+                };
+            }
+
+            Gtk.ScrolledWindow lyric_scroll {
+                hexpand: true;
+                hscrollbar-policy: never;
+
+                styles [
+                    "details-pane",
+                ]
+
+                child: Gtk.ListBox lyrics {
+                    selection-mode: none;
+
+                    styles [
+                        "lyrics-list",
+                    ]
+                };
+            }
+        };
+
+        // 下方包含播放列表编辑和全部播放控件.
+        end-child: Gtk.Box lower_content {
+            orientation: vertical;
+            spacing: 8;
+
+            Gtk.Box playlist_panel {
+                orientation: vertical;
+                vexpand: true;
+
+                styles [
+                    "content-pane",
+                ]
+
+                Gtk.ScrolledWindow {
+                    vexpand: true;
+                    // 文件路径超出视图宽度时显示水平滚动条.
+                    hscrollbar-policy: automatic;
+
+                    child: Gtk.ListBox playlist {
+                        selection-mode: multiple;
+                        activate-on-single-click: false;
+
+                        styles [
+                            "playlist-list",
+                        ]
+                    };
+                }
+
+                // FlowBox wraps utility buttons rather than compressing them in narrow windows.
+                Gtk.FlowBox playlist_controls {
+                    selection-mode: none;
+                    column-spacing: 4;
+                    row-spacing: 4;
+                    margin-top: 6;
+                    margin-bottom: 6;
+                    margin-start: 8;
+                    margin-end: 8;
+
+                    styles [
+                        "playlist-controls",
+                    ]
+
+                    Gtk.Button button_refresh_playlist {
+                        label: _("↻");
+                        tooltip-text: _("重新获取完整播放列表");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_locate {
+                        label: _("⊙");
+                        tooltip-text: _("定位到当前播放");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_select_up {
+                        label: _("↑");
+                        tooltip-text: _("将所有选中项上移一位");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_select_down {
+                        label: _("↓");
+                        tooltip-text: _("将所有选中项下移一位");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_select_top {
+                        label: _("⤒");
+                        tooltip-text: _("将所有选中项移动到播放列表顶部");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_select_bottom {
+                        label: _("⤓");
+                        tooltip-text: _("将所有选中项移动到播放列表底部");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_current_to_selected_up {
+                        label: _("当前到选中");
+                        tooltip-text: _("把当前播放项移动到所有选中项之前");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_selected_to_current_down {
+                        label: _("选中到当前");
+                        tooltip-text: _("将所有选中项移动到当前播放项之后");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+
+                    Gtk.Button button_toggle_playlist_display {
+                        label: _("切换显示");
+                        tooltip-text: _("切换文件名和完整路径显示");
+
+                        styles [
+                            "utility-button",
+                        ]
+                    }
+                }
+            }
+
+            // 播放进度和主控件组成独立控制栏.
+            Gtk.Box playback_panel {
+                orientation: vertical;
+                spacing: 4;
+
+                styles [
+                    "control-bar",
+                ]
+
+                Gtk.Scale progress_scale {
+                    orientation: horizontal;
+                    draw-value: false;
+                    hexpand: true;
+                    sensitive: false;
+                    tooltip-text: _("拖动或点击以跳转播放进度");
+
+                    styles [
+                        "progress-scale",
+                    ]
+                }
+
+                Gtk.Box player_controls {
+                    spacing: 6;
+
+                    // Keep transport controls grouped and fixed while text yields horizontal space.
+                    Gtk.Box transport_controls {
+                        spacing: 6;
+
+                        Gtk.Button button_previous {
+                            label: _("⏮");
+
+                            styles [
+                                "player-button",
+                            ]
+                        }
+
+                        Gtk.Button button_play {
+                            label: _("▶");
+
+                            styles [
+                                "player-button",
+                                "play-button",
+                            ]
+                        }
+
+                        Gtk.Button button_next {
+                            label: _("⏭");
+
+                            styles [
+                                "player-button",
+                            ]
+                        }
+                    }
+
+                    Gtk.Label title_label {
+                        label: _("正在连接 mpv…");
+                        hexpand: true;
+                        width-request: 0;
+                        ellipsize: end;
+                        xalign: 0.0;
+
+                        styles [
+                            "track-title",
+                        ]
+                    }
+
+                    Gtk.Label time_label {
+                        label: _("00 :00 / 00 :00");
+
+                        styles [
+                            "time-label",
+                        ]
+                    }
+
+                    Gtk.Box volume_controls {
+                        spacing: 4;
+
+                        Gtk.Label {
+                            label: _("音量");
+
+                            styles [
+                                "dim-label",
+                            ]
+                        }
+
+                        Gtk.Scale volume_scale {
+                            orientation: horizontal;
+                            draw-value: false;
+                            width-request: 88;
+                            tooltip-text: _("拖动或点击以调节音量");
+
+                            styles [
+                                "volume-scale",
+                            ]
+                        }
+                    }
+                }
+            }
+        };
+    }
+}

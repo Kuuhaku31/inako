@@ -1,0 +1,44 @@
+
+# 每个可执行文件只激活自己需要的依赖,
+# 避免例如窗口进程被迫动态链接仅 daemon 才用到的 libmpv (以及它级联的编解码器/音频后端库),
+# 减少进程冷启动时加载共享库的开销.
+
+[package]
+name = "inako"
+version = "0.0.0"
+edition = "2024"
+
+[[bin]]
+name = "inako-dae"
+path = "src/bin/inako-dae.rs"
+required-features = ["daemon"]
+
+[[bin]]
+name = "inako-cli"
+path = "src/bin/inako-cli.rs"
+required-features = ["media"]
+
+[[bin]]
+name = "inako-gui"
+path = "src/bin/inako-gui.rs"
+required-features = ["gui"]
+
+
+[features]
+# 默认激活全部三个 feature,
+# 使既有的 `cargo build`/`cargo check --bins`/ `cargo test --bins` 工作流不受影响.
+# 各依赖仍然是可选的: Cargo 按 crate 粒度统一激活 feature 用于编译,
+# 但最终链接阶段每个可执行文件只会拉入自己实际引用到的库
+# 因此这里的默认全开不会牺牲运行时收益.
+default = ["daemon", "media", "gui"]
+daemon = ["dep:libmpv2"]
+media = ["dep:lofty"]
+gui = ["dep:gtk", "dep:gdk-pixbuf", "media"]
+
+[dependencies]
+gdk-pixbuf = { version = "0.22", optional = true }
+gtk = { package = "gtk4", version = "0.11", optional = true }
+libmpv2 = { version = "6", default-features = false, optional = true }
+lofty = { version = "0.25", optional = true }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

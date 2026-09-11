@@ -1,0 +1,298 @@
+/* Inako GUI -- refined dark GTK4 theme */
+
+window.inako-gui {
+  background: #0d0f12;
+  color: #e6e9ef;
+}
+
+window.inako-gui paned,
+window.inako-gui scrolledwindow,
+window.inako-gui viewport,
+window.inako-gui list,
+window.inako-gui picture {
+  background: transparent;
+  color: #e6e9ef;
+}
+
+/* Main content split areas */
+window.inako-gui .content-pane,
+window.inako-gui .details-pane {
+  background: #12151a;
+  border: 1px solid #242932;
+  border-radius: 14px;
+}
+
+window.inako-gui .cover-frame {
+  min-width: 124px;
+  min-height: 124px;
+  background: #12151a;
+  border: 1px solid #242932;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+window.inako-gui .cover-frame picture {
+  background: #080a0d;
+  border-radius: 9px;
+}
+
+/* Lists */
+window.inako-gui list {
+  padding: 8px;
+}
+
+window.inako-gui row {
+  min-height: 38px;
+  margin: 2px 0;
+  padding: 7px 10px;
+  border-radius: 9px;
+  background: transparent;
+  color: #d9dde5;
+  transition: 120ms ease;
+}
+
+window.inako-gui row:hover {
+  background: #1b2028;
+}
+
+window.inako-gui .playlist-list row:selected {
+  background: #263247;
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 #8ab4f8;
+}
+
+/* Lyrics */
+window.inako-gui .lyrics-list row {
+  min-height: 30px;
+  padding: 4px 14px;
+  margin: 1px 6px;
+  color: #858c99;
+}
+
+window.inako-gui .lyrics-list row:hover {
+  background: #171b21;
+  color: #b9bec8;
+}
+
+window.inako-gui .current-lyric {
+  color: #9fc2ff;
+  font-size: 1.15em;
+  font-weight: 700;
+}
+
+/* Playlist */
+window.inako-gui .playlist-list {
+  padding: 2px;
+}
+
+window.inako-gui .playlist-list row {
+  min-height: 24px;
+  margin: 0;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+window.inako-gui .current-playlist {
+  color: #9fc2ff;
+  font-weight: 700;
+  background: rgba(90, 130, 190, 0.12);
+}
+
+window.inako-gui .playlist-list row:selected.current-playlist {
+  background: #2d4162;
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 #a9c9ff;
+}
+
+window.inako-gui .playlist-drop-before {
+  box-shadow: inset 0 2px 0 #8ab4f8;
+  background: rgba(138, 180, 248, 0.08);
+}
+
+window.inako-gui .playlist-drop-after {
+  box-shadow: inset 0 -2px 0 #8ab4f8;
+  background: rgba(138, 180, 248, 0.08);
+}
+
+window.inako-gui .playlist-drag-source {
+  opacity: 0.35;
+}
+
+/* DragIcon 是独立于应用窗口的 GTK root, 因此不能使用 window 前缀. */
+.playlist-drag-icon {
+  min-height: 24px;
+  padding: 2px 6px;
+  border: 1px solid #8ab4f8;
+  border-radius: 3px;
+  background: #263247;
+  color: #ffffff;
+  font-size: 0.9em;
+  opacity: 0.92;
+}
+
+/* Playback progress */
+window.inako-gui scale.progress-scale {
+  min-height: 16px;
+  padding: 0 4px;
+}
+
+window.inako-gui scale.progress-scale trough {
+  min-height: 4px;
+  border-radius: 2px;
+  background: #303641;
+}
+
+window.inako-gui scale.progress-scale highlight {
+  min-height: 4px;
+  border-radius: 2px;
+  background: #8ab4f8;
+}
+
+window.inako-gui scale.progress-scale slider {
+  min-width: 12px;
+  min-height: 12px;
+  margin: -4px;
+  border: 1px solid #8ab4f8;
+  border-radius: 7px;
+  background: #d7e5ff;
+}
+
+window.inako-gui scale.progress-scale:disabled {
+  opacity: 0.4;
+}
+
+window.inako-gui scale.volume-scale {
+  min-height: 16px;
+}
+
+window.inako-gui scale.volume-scale trough {
+  min-height: 4px;
+  border-radius: 2px;
+  background: #303641;
+}
+
+window.inako-gui scale.volume-scale highlight {
+  min-height: 4px;
+  border-radius: 2px;
+  background: #9fc2ff;
+}
+
+window.inako-gui scale.volume-scale slider {
+  min-width: 12px;
+  min-height: 12px;
+  margin: -4px;
+  border: 1px solid #8ab4f8;
+  border-radius: 7px;
+  background: #d7e5ff;
+}
+
+/* Buttons */
+window.inako-gui button {
+  min-height: 34px;
+  padding: 4px 11px;
+  border: 1px solid #303641;
+  border-radius: 9px;
+  background: #191d23;
+  color: #dfe3ea;
+  box-shadow: none;
+}
+
+window.inako-gui button:hover {
+  background: #222831;
+  border-color: #3d4654;
+}
+
+window.inako-gui button:active {
+  background: #15191e;
+}
+
+window.inako-gui button:disabled {
+  opacity: 0.45;
+}
+
+window.inako-gui .player-button {
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 20px;
+}
+
+window.inako-gui .play-button {
+  min-width: 46px;
+  min-height: 46px;
+  border-radius: 23px;
+  background: #8ab4f8;
+  border-color: #8ab4f8;
+  color: #0b0f15;
+  font-weight: 700;
+}
+
+window.inako-gui .play-button:hover {
+  background: #a8c8ff;
+  border-color: #a8c8ff;
+}
+
+window.inako-gui .secondary-button {
+  background: #161a20;
+  color: #b7beca;
+}
+
+window.inako-gui .control-bar {
+  margin-top: 2px;
+  padding: 8px 10px;
+  border: 1px solid #242932;
+  border-radius: 12px;
+  background: #12151a;
+}
+
+window.inako-gui .playlist-controls {
+  border-top: 1px solid #242932;
+}
+
+window.inako-gui .utility-button {
+  min-height: 28px;
+  min-width: 34px;
+  padding: 2px 8px;
+  border-radius: 7px;
+  font-size: 0.9em;
+}
+
+window.inako-gui .player-controls {
+  min-width: 0;
+}
+
+window.inako-gui .track-title {
+  min-width: 0;
+}
+
+window.inako-gui .volume-scale {
+  min-width: 32px;
+}
+
+/* Text */
+window.inako-gui .track-title {
+  color: #f0f2f6;
+  font-weight: 600;
+}
+
+window.inako-gui .time-label,
+window.inako-gui .dim-label {
+  color: #858c99;
+}
+
+window.inako-gui separator {
+  background: #2a3039;
+}
+
+/* Scrollbars */
+window.inako-gui scrollbar slider {
+  min-width: 7px;
+  min-height: 7px;
+  border-radius: 4px;
+  background: #454c57;
+}
+
+window.inako-gui scrollbar slider:hover {
+  background: #5a6370;
+}
