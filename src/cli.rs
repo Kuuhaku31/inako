@@ -14,8 +14,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 mod request;
 mod watch;
 
+pub type CliArguments = (CliCommand, Option<PathBuf>);
+
 /// 已解析的 CLI 命令. 参数验证和文本解析由二进制入口完成.
-pub enum Command {
+pub enum CliCommand {
     Status,
     Watch,
     Stop,
@@ -35,31 +37,33 @@ pub enum Command {
 }
 
 /// 执行已解析的 CLI 命令.
-pub fn execute(command: Command, socket_path: Option<PathBuf>) -> Result<(), String> {
+// pub fn execute(command: Command, socket_path: Option<PathBuf>) -> Result<(), String> {
+pub fn execute(arg: CliArguments) -> Result<(), String> {
+    let (command, socket_path) = arg;
     match command {
-        Command::Status => print_status(false, socket_path),
-        Command::Watch => watch(socket_path),
-        Command::Stop => send(ClientMessage::Shutdown, socket_path),
-        Command::Toggle => send(ClientMessage::Toggle, socket_path),
-        Command::Seek(seconds) => send(ClientMessage::Seek(seconds), socket_path),
-        Command::Next => send(ClientMessage::Next, socket_path),
-        Command::Previous => send(ClientMessage::Previous, socket_path),
-        Command::LoadPlaylist(path) => send(ClientMessage::LoadPlaylist(path), socket_path),
-        Command::SwitchPlaylist(name) => send(ClientMessage::SwitchPlaylist(name), socket_path),
-        Command::SavePlaylist(name) => send(ClientMessage::SavePlaylist(name), socket_path),
-        Command::Add(path) => edit_playlist(socket_path, |len, _| {
+        CliCommand::Status => print_status(false, socket_path),
+        CliCommand::Watch => watch(socket_path),
+        CliCommand::Stop => send(ClientMessage::Shutdown, socket_path),
+        CliCommand::Toggle => send(ClientMessage::Toggle, socket_path),
+        CliCommand::Seek(seconds) => send(ClientMessage::Seek(seconds), socket_path),
+        CliCommand::Next => send(ClientMessage::Next, socket_path),
+        CliCommand::Previous => send(ClientMessage::Previous, socket_path),
+        CliCommand::LoadPlaylist(path) => send(ClientMessage::LoadPlaylist(path), socket_path),
+        CliCommand::SwitchPlaylist(name) => send(ClientMessage::SwitchPlaylist(name), socket_path),
+        CliCommand::SavePlaylist(name) => send(ClientMessage::SavePlaylist(name), socket_path),
+        CliCommand::Add(path) => edit_playlist(socket_path, |len, _| {
             Ok(PlaylistChangeKind::Add(vec![(len, path)]))
         }),
-        Command::Clear => edit_playlist(socket_path, |_, playlist| {
+        CliCommand::Clear => edit_playlist(socket_path, |_, playlist| {
             Ok(PlaylistChangeKind::Delete((0..playlist.len()).collect()))
         }),
-        Command::Remove(index) => edit_playlist(socket_path, |_, _| {
+        CliCommand::Remove(index) => edit_playlist(socket_path, |_, _| {
             Ok(PlaylistChangeKind::Delete(vec![index]))
         }),
-        Command::Move { from, to } => edit_playlist(socket_path, |_, _| {
+        CliCommand::Move { from, to } => edit_playlist(socket_path, |_, _| {
             Ok(PlaylistChangeKind::Move(vec![(from, to)]))
         }),
-        Command::Shuffle => edit_playlist(socket_path, |_, playlist| {
+        CliCommand::Shuffle => edit_playlist(socket_path, |_, playlist| {
             let mut order: Vec<usize> = (0..playlist.len()).collect();
             let seed = SystemTime::now()
                 .duration_since(UNIX_EPOCH)
@@ -79,7 +83,7 @@ pub fn execute(command: Command, socket_path: Option<PathBuf>) -> Result<(), Str
                     .collect(),
             ))
         }),
-        Command::Play { index, position } => send(
+        CliCommand::Play { index, position } => send(
             ClientMessage::Play(
                 index,
                 position,

@@ -6,12 +6,13 @@ use std::env;
 use std::path::PathBuf;
 use std::time::Duration;
 
-use inako::cli::{self, Command};
+use inako::cli::{self, CliCommand, CliArguments};
 
 
 fn main() {
-    let result = parse_command().and_then(|(command, socket)| cli::execute(command, socket));
-    if let Err(error) = result {
+
+    if let Err(error) = parse_command()
+    .and_then(|a| cli::execute(a)) {
         eprintln!("{error}");
         std::process::exit(1);
     }
@@ -19,7 +20,8 @@ fn main() {
 
 
 /// 解析 CLI 命令行参数并返回解析后的命令和可选的 Unix Socket 路径
-fn parse_command() -> Result<(Command, Option<PathBuf>), String> {
+fn parse_command() -> Result<CliArguments, String> {
+
     let mut arguments = env::args().skip(1);
     let command = arguments.next().unwrap_or_else(|| "status".to_string());
     let mut socket = None;
@@ -33,22 +35,22 @@ fn parse_command() -> Result<(Command, Option<PathBuf>), String> {
     }
     let mut values = values.into_iter();
     let command = match command.as_str() {
-        "status" => Command::Status,
-        "watch" => Command::Watch,
-        "stop" => Command::Stop,
-        "toggle" => Command::Toggle,
-        "seek" => Command::Seek(parse_seconds(values.next())?),
-        "next" => Command::Next,
-        "previous" | "prev" => Command::Previous,
-        "load-playlist" | "load-playlist-by-txt-file" => Command::LoadPlaylist(PathBuf::from(required(&mut values, "播放列表文件路径")?)),
-        "switch-playlist" => Command::SwitchPlaylist(required(&mut values, "播放列表名称")?),
-        "save-playlist" => Command::SavePlaylist(required(&mut values, "播放列表名称")?),
-        "add" => Command::Add(PathBuf::from(required(&mut values, "媒体文件路径")?)),
-        "clear" => Command::Clear,
-        "remove" => Command::Remove(parse_index(values.next())?),
-        "move" => Command::Move { from: parse_index(values.next())?, to: parse_index(values.next())? },
-        "shuffle" => Command::Shuffle,
-        "play" => Command::Play {
+        "status" => CliCommand::Status,
+        "watch" => CliCommand::Watch,
+        "stop" => CliCommand::Stop,
+        "toggle" => CliCommand::Toggle,
+        "seek" => CliCommand::Seek(parse_seconds(values.next())?),
+        "next" => CliCommand::Next,
+        "previous" | "prev" => CliCommand::Previous,
+        "load-playlist" | "load-playlist-by-txt-file" => CliCommand::LoadPlaylist(PathBuf::from(required(&mut values, "播放列表文件路径")?)),
+        "switch-playlist" => CliCommand::SwitchPlaylist(required(&mut values, "播放列表名称")?),
+        "save-playlist" => CliCommand::SavePlaylist(required(&mut values, "播放列表名称")?),
+        "add" => CliCommand::Add(PathBuf::from(required(&mut values, "媒体文件路径")?)),
+        "clear" => CliCommand::Clear,
+        "remove" => CliCommand::Remove(parse_index(values.next())?),
+        "move" => CliCommand::Move { from: parse_index(values.next())?, to: parse_index(values.next())? },
+        "shuffle" => CliCommand::Shuffle,
+        "play" => CliCommand::Play {
             index: parse_index(values.next())?,
             position: Duration::from_secs_f64(values.next().map(|value| parse_seconds(Some(value))).transpose()?.unwrap_or(0.0)),
         },
