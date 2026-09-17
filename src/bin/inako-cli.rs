@@ -62,6 +62,12 @@ fn parse_command() -> Result<CliArguments, String> {
             print_version();
             std::process::exit(0);
         }
+        "rebuild-playlist" => {
+            let playlist_path = PathBuf::from(required(&mut values, "播放列表文件路径")?);
+            let current = values.next().map(|value| parse_index(Some(value))).transpose()?;
+            cli::rebuild_playlist(playlist_path.to_str().ok_or("播放列表文件路径无效")?, current)?;
+            return Err(format!("rebuild-playlist 命令已执行, 播放列表已重建: {}", playlist_path.display()));
+        },
         _ => return Err(format!("未知命令: {command}\n运行 inako-cli help 查看用法")),
     };
     if values.next().is_some() {

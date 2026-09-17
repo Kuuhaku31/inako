@@ -3,7 +3,7 @@
 // CLI 命令执行逻辑模块
 
 use crate::models::ipc::{ClientMessage};
-use crate::models::playlist_manager::{PlaylistChangeKind, PlaylistChangeMessage};
+use crate::models::playlist_manager::{Playlist, PlaylistChangeKind, PlaylistChangeMessage};
 use crate::models::{MediaContent, PlayerState};
 use crate::utils::{format_time, get_lyric_current_line, read_media};
 use serde_json::{Value, json};
@@ -205,4 +205,37 @@ fn status_text(state: &PlayerState, media: &MediaContent) -> String {
         format_time(state.position),
         format_time(state.duration)
     )
+}
+
+
+pub fn rebuild_playlist(file_path: &str, current: Option<usize>)
+    -> Result<(), String>
+{
+   // 读取文件
+    let content = std::fs::read_to_string(&file_path)
+        .map_err(|error| format!("无法读取播放列表文件 {file_path:?}: {error}"))?;
+
+    // 解析每行路径
+    let mut playlist: Playlist = Vec::new();
+    for (line_number, line) in content.lines().enumerate() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let path = PathBuf::from(line);
+        if !path.exists() {
+            return Err(format!("播放列表文件第 {} 行路径不存在: {:?}", line_number + 1, path));
+        }
+        playlist.push(path);
+    }
+
+    let change: PlaylistChangeKind = PlaylistChangeKind::Rebuild(playlist, current);
+    let client_message = ClientMessage::PlaylistChange(PlaylistChangeMessage {
+        state_number: 0, // 这里假设客户端会处理版本号
+        change,
+    });
+
+    send(client_message, None)?;
+
+    Ok(())
 }
