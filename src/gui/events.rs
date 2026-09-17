@@ -72,11 +72,13 @@ pub(super) fn connect_events(gui: &Rc<GuiManager>) {
             let style = gui.get_playlist_display_style();
             println!("当前播放列表显示样式: {style}");
 
-            if style == "name" {
-                gui.set_playlist_display_style("path");
-            } else {
-                gui.set_playlist_display_style("name");
-            }
+            // 按 文件名 -> 完整路径 -> 专辑/歌手/标题 -> 文件名 循环切换.
+            let next_style = match style.as_str() {
+                "name" => "path",
+                "path" => "tags",
+                _ => "name",
+            };
+            gui.set_playlist_display_style(next_style);
 
             let style_after = gui.get_playlist_display_style();
             println!("切换播放列表显示样式后: {style_after}");

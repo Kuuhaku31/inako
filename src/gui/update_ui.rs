@@ -177,6 +177,29 @@ fn new_playlist_row() -> gtk::ListBoxRow {
     row
 }
 
+/// 读取音频标签并按 "专辑 · 歌手 · 标题" 顺序拼接展示文本, 缺失的字段直接跳过.
+/// 标题缺失或标签读取失败时, 整体回退为文件名, 避免播放列表行显示空白.
+fn track_tags_display_text(path: &Path) -> String {
+    let fallback_name = || {
+        path.file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or_default()
+            .to_string()
+    };
+
+    let Some((title, artist, album)) = crate::utils::read_track_tags(path) else {
+        return fallback_name();
+    };
+
+    let title = if title.is_empty() { fallback_name() } else { title };
+
+    [album, artist, title]
+        .into_iter()
+        .filter(|field| !field.is_empty())
+        .collect::<Vec<_>>()
+        .join(" · ")
+}
+
 /// 设置一行播放列表控件的编号, 文件路径, 提示文本和当前播放标记.
 ///
 /// tooltip 同时保存完整路径, 供 reindex_rows/apply_playlist_change 在
@@ -187,7 +210,8 @@ fn set_row_content(row: &gtk::ListBoxRow, path: &Path, index: usize, is_current:
         .and_downcast::<gtk::Label>()
         .expect("playlist row child must be a GtkLabel");
 
-    // 如果 display_type 是 "name", 则只显示文件名, 否则显示完整路径.
+    // display_type 为 "name" 只显示文件名, "tags" 显示 专辑 · 歌手 · 标题,
+    // 其余情况 (包括 "path") 显示完整路径.
 
     // 行文本根据 display_type 决定显示内容.
     let display_text = if display_type == "name" {
@@ -195,6 +219,8 @@ fn set_row_content(row: &gtk::ListBoxRow, path: &Path, index: usize, is_current:
             .and_then(|name| name.to_str())
             .unwrap_or_default()
             .to_string()
+    } else if display_type == "tags" {
+        track_tags_display_text(path)
     } else {
         path.display().to_string()
     };

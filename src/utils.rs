@@ -363,6 +363,21 @@ pub(crate) fn read_media(path: &Path) -> Result<MediaContent, String> {
     })
 }
 
+/// 仅读取标题, 歌手, 专辑三项标签, 供播放列表行按 "专辑 · 歌手 · 标题" 展示使用.
+/// 跳过歌词和封面解析, 降低整份播放列表批量渲染时的开销.
+/// 返回值依次为 (标题, 歌手, 专辑), 读取失败时返回 None.
+#[cfg(feature = "media")]
+pub(crate) fn read_track_tags(path: &Path) -> Option<(String, String, String)> {
+    let file = lofty::read_from_path(path).ok()?;
+    let tag = file.primary_tag().or_else(|| file.first_tag())?;
+
+    let title = tag.title().map(|value| value.into_owned()).unwrap_or_default();
+    let artist = tag.artist().map(|value| value.into_owned()).unwrap_or_default();
+    let album = tag.album().map(|value| value.into_owned()).unwrap_or_default();
+
+    Some((title, artist, album))
+}
+
 /// 解析 LRC 文本并按时间升序返回歌词行.
 #[cfg(feature = "media")]
 pub(crate) fn parse_lrc(input: &str) -> Vec<LyricLine> {
